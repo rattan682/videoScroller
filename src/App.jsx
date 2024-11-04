@@ -15,48 +15,27 @@ function App() {
       maxIndex: 382,
     };
 
-    const images = [];
-    let imagesLoaded = 0;
+    let img = new Image();
+    img.src = `frames/frame_${frames.currentIndex.toString().padStart(4, "0")}.jpg`;
 
     const loadImage = (index) => {
-      const img = images[index];
-      if (!img) return;
+      img.src = `frames/frame_${index.toString().padStart(4, "0")}.jpg`;
+      img.onload = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const scaleX = canvas.width / img.width;
+        const scaleY = canvas.height / img.height;
+        const scale = Math.max(scaleX, scaleY);
+        
+        const newWidth = img.width * scale;
+        const newHeight = img.height * scale;
+        const offsetX = (canvas.width - newWidth) / 2;
+        const offsetY = (canvas.height - newHeight) / 2;
 
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      const scaleX = canvas.width / img.width;
-      const scaleY = canvas.height / img.height;
-      const scale = Math.max(scaleX, scaleY);
-
-      const newWidth = img.width * scale;
-      const newHeight = img.height * scale;
-
-      const offsetX = (canvas.width - newWidth) / 2;
-      const offsetY = (canvas.height - newHeight) / 2;
-
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.imageSmoothingEnabled = true;
-      context.imageSmoothingQuality = "high";
-      context.drawImage(img, offsetX, offsetY, newWidth, newHeight);
-
-      frames.currentIndex = index;
-    };
-
-    const preLoadImages = () => {
-      for (let i = 1; i <= frames.maxIndex; i++) {
-        const imageUrl = `frames/frame_${i.toString().padStart(4, "0")}.jpg`;
-        const img = new Image();
-        img.src = imageUrl;
-        img.onload = () => {
-          imagesLoaded++;
-          if (imagesLoaded === frames.maxIndex) {
-            loadImage(frames.currentIndex);
-            startAnimation(); // Start animation after preloading
-          }
-        };
-        images.push(img);
-      }
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+      };
     };
 
     const startAnimation = () => {
@@ -65,10 +44,9 @@ function App() {
           scrollTrigger: {
             trigger: ".canv",
             start: "top top",
-            end: "bottom bottom", // Adjust this value for the animation duration
+            end: "bottom bottom",
             scrub: 2,
-            pin: true, // This keeps the section fixed during the scroll
-            markers: true, // Optional: visualize start and end points for debugging
+            pin: true,
           },
         })
         .to(frames, {
@@ -79,28 +57,21 @@ function App() {
         });
     };
 
-    window.addEventListener("resize", () => {
-      loadImage(frames.currentIndex);
-    });
+    window.addEventListener("resize", () => loadImage(Math.floor(frames.currentIndex)));
 
-    preLoadImages();
+    startAnimation();
+    loadImage(frames.currentIndex);
 
     return () => {
-      window.removeEventListener("resize", () =>
-        loadImage(frames.currentIndex)
-      );
+      window.removeEventListener("resize", () => loadImage(Math.floor(frames.currentIndex)));
     };
   }, []);
 
   return (
     <>
-{/*       
-      <canvas className=""></canvas> */}
-
-
-      <div className="w-full     bg-zinc-900">
-        <div className="parent  relative top-0   w-full h-[700vh]  ">
-          <div className="w-full  sticky top-0 left-0  ">
+      <div className="w-full bg-zinc-900">
+        <div className="parent relative top-0 w-full h-[700vh]">
+          <div className="w-full sticky top-0 left-0">
             <canvas className=""></canvas>
           </div>
         </div>
