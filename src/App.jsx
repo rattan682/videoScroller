@@ -2,6 +2,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./App.css";
 import { useEffect } from "react";
+import { Eyes } from "./Eyes";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -76,6 +77,7 @@ function App() {
           </div>
         </div>
       </div>
+        <Eyes/>
     </>
   );
 }
